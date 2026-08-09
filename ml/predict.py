@@ -1,7 +1,11 @@
 import joblib
 import pandas as pd
 
+from decision_engine import make_decision
+
 model = joblib.load("ml/ml_model.pkl")
+
+machine_id = "M003"
 
 machine = pd.DataFrame([{
     "Temperature": 88,
@@ -12,22 +16,25 @@ machine = pd.DataFrame([{
 }])
 
 prediction = model.predict(machine)[0]
+
 probability = model.predict_proba(machine)[0][1]
+
 failure_probability = probability * 100
 
-print("\n CogniFact AI ")
-print("Machine: M003")
+print("\n CogniFact AI Prediction")
+print(f"Machine: {machine_id}")
 
 print(f"Failure Probability: {failure_probability:.2f}%")
 
 if failure_probability >= 70:
-    risk = "HIGH 🔴"
+    risk = "HIGH"
 elif failure_probability >= 30:
-    risk = "MEDIUM 🟡"
+    risk = "MEDIUM"
 else:
-    risk = "LOW 🟢"
+    risk = "LOW"
 
-print("Risk Level:", risk)
+print(f"Risk Level: {risk}")
+
 feature_names = [
     "Temperature",
     "Vibration",
@@ -48,19 +55,22 @@ importance_df = importance_df.sort_values(
     ascending=False
 )
 
-print("\nAI Feature Importance:")
+print("\n===== AI Feature Importance =====")
 
 for _, row in importance_df.iterrows():
     print(
         f"{row['Feature']}: "
         f"{row['Importance'] * 100:.2f}%"
     )
-print("\nRecommended Action:")
 
-if failure_probability >= 70:
-    print(" Schedule preventive maintenance.")
-    print(" Consider shifting some production to another machine.")
-elif failure_probability >= 30:
-    print(" Inspect the machine soon.")
-else:
-    print(" Continue normal operation.")
+print("\nAI Recommendation")
+
+recommended_action = make_decision(
+    failure_probability
+)
+
+print(
+    f"Recommended Action: {recommended_action}"
+)
+make_decision(machine_id, failure_probability)
+

@@ -1,8 +1,17 @@
 import pandas as pd
 import joblib
-machine_data = pd.read_csv("data/cognifact_machine_dataset.csv")
-maintenance_data = pd.read_csv("data/maintenance_data.csv")
-production_data = pd.read_csv("data/production_data.csv")
+from decision_engine import make_decision
+machine_data = pd.read_csv(
+    "data/cognifact_machine_dataset.csv"
+)
+
+maintenance_data = pd.read_csv(
+    "data/maintenance_data.csv"
+)
+
+production_data = pd.read_csv(
+    "data/production_data.csv"
+)
 factory_data = machine_data.merge(
     maintenance_data,
     on="Machine_ID",
@@ -14,173 +23,164 @@ factory_data = factory_data.merge(
     on="Machine_ID",
     how="left"
 )
-model = joblib.load("ml/ml_model.pkl")
-machine_id = "M003"
+model = joblib.load(
+    "ml/ml_model.pkl"
+)
+features = factory_data[
+    [
+        "Temperature",
+        "Vibration",
+        "Power_Consumption",
+        "Operating_Hours",
+        "Maintenance_Days"
+    ]
+]
+predictions = model.predict(features)
 
-machine = factory_data[
-    factory_data["Machine_ID"] == machine_id
-].iloc[0]
-features = pd.DataFrame([{
-    "Temperature": machine["Temperature"],
-    "Vibration": machine["Vibration"],
-    "Power_Consumption": machine["Power_Consumption"],
-    "Operating_Hours": machine["Operating_Hours"],
-    "Maintenance_Days": machine["Maintenance_Days"]
-}])
-prediction = model.predict(features)[0]
+probabilities = model.predict_proba(features)[:, 1]
 
-probability = model.predict_proba(features)[0][1]
 
-failure_probability = probability * 100
-if failure_probability >= 70:
-    risk_level = "HIGH "
+factory_data["Failure_Probability"] = (
+    probabilities * 100
+)
 
-elif failure_probability >= 30:
-    risk_level = "MEDIUM "
 
-else:
-    risk_level = "LOW "
-feature_names = [
-    "Temperature",
-    "Vibration",
-    "Power_Consumption",
-    "Operating_Hours",
-    "Maintenance_Days"
+factory_data["Prediction"] = predictions
+def get_risk_level(probability):
+
+    if probability >= 70:
+        return "HIGH"
+
+    elif probability >= 30:
+        return "MEDIUM"
+
+    else:
+        return "LOW"
+def get_recommended_action(probability):
+
+    if probability >= 70:
+        return "Maintenance + Shift Production"
+
+    elif probability >= 30:
+        return "Stop + Maintenance"
+
+    else:
+        return "Continue Operating"
+
+factory_data["Risk_Level"] = (
+    factory_data["Failure_Probability"]
+    .apply(get_risk_level)
+)
+factory_data["Recommended_Action"] = (
+    factory_data["Failure_Probability"]
+    .apply(get_recommended_action)
+)
+print("\n")
+print("COGNIFACT AI")
+print("FACTORY RISK MONITOR")
+print(
+    f"\nTotal Machine Records: "
+    f"{len(factory_data)}"
+)
+
+
+print(
+    f"Unique Machines: "
+    f"{factory_data['Machine_ID'].nunique()}"
+)
+results = factory_data[
+    [
+        "Machine_ID",
+        "Failure_Probability",
+        "Risk_Level",
+        "Recommended_Action"
+    ]
+].copy()
+
+
+results["Failure_Probability"] = (
+    results["Failure_Probability"]
+    .round(2)
+)
+
+
+print("\nMachine Risk Status:")
+
+print(
+    results.to_string(index=False)
+)
+high_risk = factory_data[
+    factory_data["Failure_Probability"] >= 70
 ]
 
-importance = model.feature_importances_
 
-importance_df = pd.DataFrame({
-    "Feature": feature_names,
-    "Importance": importance
-})
-
-importance_df = importance_df.sort_values(
-    by="Importance",
-    ascending=False
-)
-
-maintenance_cost = machine["Maintenance_Cost"]
-
-production_value_per_hour = machine[
-    "Production_Value_Per_Hour"
+medium_risk = factory_data[
+    (factory_data["Failure_Probability"] >= 30)
+    &
+    (factory_data["Failure_Probability"] < 70)
 ]
-
-production_loss = production_value_per_hour * 4
-
-failure_loss = production_value_per_hour * 10
-shift_cost = production_value_per_hour * 2
-continue_cost = failure_loss
-maintenance_only_cost = (
-    maintenance_cost + production_loss
-)
-
-maintenance_shift_cost = (
-    maintenance_cost + shift_cost
-)
-
-
-options = {
-    "Continue Production": continue_cost,
-    "Stop + Maintenance": maintenance_only_cost,
-    "Maintenance + Shift Production": maintenance_shift_cost
-}
-
-
-best_action = min(
-    options,
-    key=options.get
-)
-
-best_cost = options[best_action]
 print("\n")
-print("          COGNIFACT AI")
-
-print(f"\nMachine: {machine_id}")
+print("RISK SUMMARY")
 
 print(
-    f"Temperature: {machine['Temperature']} °C"
+    f" High Risk Records: "
+    f"{len(high_risk)}"
 )
 
 print(
-    f"Vibration: {machine['Vibration']}"
+    f" Medium Risk Records: "
+    f"{len(medium_risk)}"
 )
 
 print(
-    f"Power Consumption: "
-    f"{machine['Power_Consumption']} kW"
+    f" Low Risk Records: "
+    f"{len(factory_data) - len(high_risk) - len(medium_risk)}"
+)
+print("\nACTION SUMMARY")
+
+action_counts = (
+    factory_data["Recommended_Action"]
+    .value_counts()
 )
 
-print(
-    f"Operating Hours: "
-    f"{machine['Operating_Hours']}"
-)
-
-print(
-    f"Maintenance Days: "
-    f"{machine['Maintenance_Days']}"
-)
-print("AI PREDICTION")
-
-print(
-    f"Failure Probability: "
-    f"{failure_probability:.2f}%"
-)
-
-print(f"Risk Level: {risk_level}")
-print("\n")
-print("TOP RISK FACTORS")
-
-for _, row in importance_df.head(3).iterrows():
+for action, count in action_counts.items():
 
     print(
-        f"{row['Feature']}: "
-        f"{row['Importance'] * 100:.2f}%"
+        f"{action}: {count}"
     )
-print("\n")
-print("WHAT-IF ANALYSIS")
+if len(high_risk) > 0:
 
-print(
-    f"Continue Production: "
-    f"₹{continue_cost:,.0f}"
-)
+    print("\n")
+    print(" HIGH-RISK MACHINES")
 
-print(
-    f"Stop + Maintenance: "
-    f"₹{maintenance_only_cost:,.0f}"
-)
+    high_risk_display = high_risk[
+        [
+            "Machine_ID",
+            "Temperature",
+            "Vibration",
+            "Power_Consumption",
+            "Operating_Hours",
+            "Maintenance_Days",
+            "Failure_Probability",
+            "Recommended_Action"
+        ]
+    ].copy()
 
-print(
-    f"Maintenance + Shift Production: "
-    f"₹{maintenance_shift_cost:,.0f}"
-)
-print("\n")
-print("RECOMMENDATION")
-
-if failure_probability >= 70:
-
-    print(
-        f"Recommended Action: "
-        f"{best_action}"
-    )
+    high_risk_display[
+        "Failure_Probability"
+    ] = high_risk_display[
+        "Failure_Probability"
+    ].round(2)
 
     print(
-        f"Estimated Impact: "
-        f"₹{best_cost:,.0f}"
-    )
-
-    print(
-        " Immediate attention recommended."
-    )
-
-elif failure_probability >= 30:
-
-    print(
-        " Inspect the machine soon."
+        high_risk_display.to_string(
+            index=False
+        )
     )
 
 else:
 
-    print(
-        " Continue normal operation."
-    )
+    print("\n No high-risk machines detected.")
+
+
+print("        CogniFact monitoring complete")
