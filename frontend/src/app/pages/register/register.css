@@ -1,0 +1,88 @@
+body {
+  font-family: 'Poppins', sans-serif;
+}
+.register-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #ffffff;
+  padding: 20px;
+}
+
+.register-card {
+  width: 400px;
+  padding: 40px;
+  background: #ffffff;
+  border: 1px solid #e8e0d8;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.register-card h1 {
+  text-align: center;
+  color: #4a3728;
+  font-size: 30px;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #7B0323;
+  margin-bottom: 28px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  margin-bottom: 7px;
+  color: #4a3728;
+  font-weight: 600;
+}
+
+input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  margin-bottom: 18px;
+  border: 1px solid #d8cec4;
+  border-radius: 7px;
+  font-size: 15px;
+  outline: none;
+}
+
+input:focus {
+  border-color: #b89b7d;
+}
+
+button {
+  width: 100%;
+  padding: 13px;
+  margin-top: 5px;
+  border: none;
+  border-radius: 7px;
+  background: #7B0323;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #7B0323;
+}
+
+.login-text {
+  text-align: center;
+  margin-top: 22px;
+  color: #777777;
+}
+
+.login-text a {
+  color: #7B0323;
+  text-decoration: none;
+  font-weight: 600;
+}
