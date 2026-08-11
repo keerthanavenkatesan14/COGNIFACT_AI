@@ -2,48 +2,348 @@
 
   <div class="register-card">
 
-    <h1>CogniFact AI</h1>
+    <!-- BRAND -->
 
-    <p class="subtitle">
-      Create your account
-    </p>
+    <div class="brand">
 
-    <form>
+      <div class="brand-icon">
+        C
+      </div>
 
-      <label>Full Name</label>
-      <input
-        type="text"
-        placeholder="Enter your full name"
+      <div>
+        <h2>CogniFact AI</h2>
+        <span>Factory Intelligence</span>
+      </div>
+
+    </div>
+
+
+    <!-- HEADING -->
+
+    <div class="register-heading">
+
+      <p class="eyebrow">
+        FACTORY INTELLIGENCE PLATFORM
+      </p>
+
+      <h1>Create your account</h1>
+
+      <p class="subtitle">
+        Set up your Factory workspace and start monitoring your factory.
+      </p>
+
+    </div>
+
+
+    <!-- FORM -->
+
+    <form
+      (ngSubmit)="register()"
+      #registerForm="ngForm"
+      novalidate
+    >
+
+      <!-- COMPANY INFORMATION -->
+
+      <div class="section-title">
+        Factory information
+      </div>
+
+
+      <!-- COMPANY NAME -->
+
+      <div class="form-group">
+
+        <label for="company">
+          Company name
+        </label>
+
+        <input
+          id="company"
+          type="text"
+          name="company_name"
+          [(ngModel)]="registerData.company_name"
+          placeholder="Enter your company name"
+        >
+
+      </div>
+
+
+      <!-- INDUSTRY -->
+
+      <div class="form-group">
+
+        <label for="industry">
+          Industry
+        </label>
+
+        <div class="select-wrapper">
+
+          <select
+            id="industry"
+            name="industry"
+            [(ngModel)]="registerData.industry"
+          >
+
+            <option value="" disabled>
+              Select your industry
+            </option>
+
+            <option value="Automobile">
+              Automobile
+            </option>
+
+            <option value="Textile">
+              Textile
+            </option>
+
+            <option value="Engineering">
+              Engineering
+            </option>
+
+            <option value="Food Processing">
+              Food Processing
+            </option>
+
+            <option value="Electronics">
+              Electronics
+            </option>
+
+            <option value="Pharmaceutical">
+              Pharmaceutical
+            </option>
+
+            <option value="Chemical">
+              Chemical
+            </option>
+
+            <option value="Manufacturing">
+              Manufacturing
+            </option>
+
+            <option value="Other">
+              Other
+            </option>
+
+          </select>
+
+          <span class="select-arrow">
+            ▾
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- LOCATION ROW -->
+
+      <div class="form-row">
+
+        <div class="form-group">
+
+          <label for="city">
+            City
+          </label>
+
+          <input
+            id="city"
+            type="text"
+            name="city"
+            [(ngModel)]="registerData.city"
+            placeholder="Enter city"
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="state">
+            State
+          </label>
+
+          <input
+            id="state"
+            type="text"
+            name="state"
+            [(ngModel)]="registerData.state"
+            placeholder="Enter state"
+          >
+
+        </div>
+
+      </div>
+
+
+      <!-- ACCOUNT INFORMATION -->
+
+      <div class="section-title account-section">
+        Account information
+      </div>
+
+
+      <!-- FULL NAME -->
+
+      <div class="form-group">
+
+        <label for="name">
+          Full name
+        </label>
+
+        <input
+          id="name"
+          type="text"
+          name="full_name"
+          [(ngModel)]="registerData.full_name"
+          placeholder="Enter your full name"
+        >
+
+      </div>
+
+
+      <!-- PHONE -->
+
+      <div class="form-group">
+
+        <label for="phone">
+          Phone number
+        </label>
+
+        <input
+          id="phone"
+          type="tel"
+          name="phone"
+          [(ngModel)]="registerData.phone"
+          placeholder="Enter your 10-digit phone number"
+          maxlength="10"
+          inputmode="numeric"
+        >
+
+      </div>
+
+
+      <!-- EMAIL -->
+
+      <div class="form-group">
+
+        <label for="email">
+          Email address
+        </label>
+
+        <input
+          id="email"
+          type="email"
+          name="email"
+          [(ngModel)]="registerData.email"
+          placeholder="Enter your email"
+        >
+
+      </div>
+
+
+      <!-- PASSWORD ROW -->
+
+      <div class="form-row">
+
+        <div class="form-group">
+
+          <label for="password">
+            Password
+          </label>
+
+          <input
+            id="password"
+            type="password"
+            name="password"
+            [(ngModel)]="registerData.password"
+            placeholder="Create password"
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="confirmPassword">
+            Confirm password
+          </label>
+
+          <input
+            id="confirmPassword"
+            type="password"
+            name="confirmPassword"
+            [(ngModel)]="registerData.confirmPassword"
+            placeholder="Confirm password"
+          >
+
+        </div>
+
+      </div>
+
+
+      <!-- ERROR -->
+
+      <p
+        class="error-message"
+        *ngIf="errorMessage"
+      >
+        {{ errorMessage }}
+      </p>
+
+
+      <!-- SUCCESS -->
+
+      <p
+        class="success-message"
+        *ngIf="successMessage"
+      >
+        {{ successMessage }}
+      </p>
+
+
+      <!-- BUTTON -->
+
+      <button
+        type="submit"
+        [disabled]="loading"
       >
 
-      <label>Email</label>
-      <input
-        type="email"
-        placeholder="Enter your email"
-      >
+        <span *ngIf="!loading">
+          Create company account
+        </span>
 
-      <label>Password</label>
-      <input
-        type="password"
-        placeholder="Enter your password"
-      >
+        <span *ngIf="loading">
+          Creating account...
+        </span>
 
-      <label>Confirm Password</label>
-      <input
-        type="password"
-        placeholder="Confirm your password"
-      >
-
-      <button type="submit">
-        Register
       </button>
 
     </form>
 
+
+    <!-- LOGIN -->
+
     <p class="login-text">
+
       Already have an account?
-      <a routerLink="/login">Login</a>
+
+      <a routerLink="/login">
+        Sign in
+      </a>
+
     </p>
+
+
+    <!-- FOOTER -->
+
+    <div class="register-footer">
+
+      <span>
+        AI-powered factory decision intelligence
+      </span>
+
+    </div>
 
   </div>
 
