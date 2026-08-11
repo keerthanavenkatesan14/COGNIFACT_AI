@@ -2,36 +2,113 @@
 
   <div class="login-card">
 
-    <h1>CogniFact AI</h1>
+    <div class="brand">
+      <div class="brand-icon">C</div>
 
-    <p class="subtitle">
-      Welcome back
-    </p>
+      <div>
+        <h2>CogniFact AI</h2>
+        <span>Factory Intelligence</span>
+      </div>
+    </div>
 
-    <form>
 
-      <label>Email</label>
-      <input
-        type="email"
-        placeholder="Enter your email"
+    <div class="login-heading">
+
+      <p class="eyebrow">
+        FACTORY INTELLIGENCE PLATFORM
+      </p>
+
+      <h1>Welcome back</h1>
+
+      <p class="subtitle">
+        Sign in to monitor your factory and make smarter decisions.
+      </p>
+
+    </div>
+
+
+    <!-- Login Form -->
+    <form (ngSubmit)="login()" #loginForm="ngForm">
+
+      <div class="form-group">
+
+        <label for="email">
+          Email address
+        </label>
+
+        <input
+          id="email"
+          type="email"
+          name="email"
+          [(ngModel)]="loginData.email"
+          placeholder="Enter your email"
+          required
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <div class="password-label">
+
+          <label for="password">
+            Password
+          </label>
+
+          <a href="#">
+            Forgot password?
+          </a>
+
+        </div>
+
+        <input
+          id="password"
+          type="password"
+          name="password"
+          [(ngModel)]="loginData.password"
+          placeholder="Enter your password"
+          required
+        >
+
+      </div>
+
+
+      <button
+        type="submit"
+        [disabled]="!loginForm.valid || loading"
       >
 
-      <label>Password</label>
-      <input
-        type="password"
-        placeholder="Enter your password"
-      >
+        {{ loading ? 'Signing in...' : 'Sign in to CogniFact' }}
 
-      <button type="submit">
-        Login
       </button>
+
+
+      <!-- Error -->
+      <p class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </p>
 
     </form>
 
+
+    <!-- Register -->
     <p class="register-text">
-      Don't have an account?
-      <a routerLink="/register">Register</a>
+
+      Don't have a Factory account?
+
+      <a routerLink="/register">
+        Create an account
+      </a>
+
     </p>
+
+
+    <div class="login-footer">
+
+      <span>AI-powered factory decision intelligence</span>
+
+    </div>
 
   </div>
 
