@@ -66,6 +66,7 @@ for _, row in importance_df.iterrows():
 print("\nAI Recommendation")
 
 recommended_action = make_decision(
+    machine_id,
     failure_probability
 )
 

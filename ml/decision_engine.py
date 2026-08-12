@@ -1,4 +1,4 @@
-def make_decision(failure_probability):
+def make_decision(machine_id,failure_probability):
 
     machine_id = "M003"
 
